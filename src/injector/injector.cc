@@ -48,50 +48,15 @@ void FI::FlipBit(Tick _injTick, int injR, int injBit, int regType)
 
 Injector::Injector(InjectorParams *params) : 
     SimObject(params),
-    startPC(params->startPC),
-    endPC(params->endPC),
+    startPC(strtoul(params->startPC.c_str(), NULL, 16)),
+    endPC(strtoul(params->endPC.c_str(), NULL, 16)),
     ISA(params->ISA),
-    injPC(params->injPC),
-    injBit(params->injBit),
-    injTick(params->injTick),
-    injReg(params->injReg),
-    regType(params->regType),
-    srcDest(params->srcDest),
     timeoutVal(params->timeout),
     goldenFile(params->goldenFile)
 {
-    
-
-    if (goldenFile != "")
-    {
-        
-
-        std::ifstream goldFile(goldenFile);
-        if (goldFile.is_open())
-        {
-            std::string line, strInjTick;
-            bool started = false;
-
-            strInjTick = std::to_string(injTick); // look for first tick before filling vector
-
-            while (std::getline(goldFile, line))
-            {
-                if (!started)
-                {
-                    if (line.find(strInjTick) != std::string::npos)
-                    {
-                        started = true;
-                    }
-                }
-                if (started)
-                    goldenTrace.push_back(line);
-            }
-            goldFile.close();
-        }
-    }
-    
-
     //DPRINTF("Testing object!\n");
+    printf("start pc: %ld\n", startPC);
+    printf("end pc: %ld\n", endPC);
 }
 
 void Injector::PerformFI(ThreadContext* _thread, Tick _when, 

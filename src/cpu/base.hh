@@ -265,11 +265,7 @@ class BaseCPU : public ClockedObject
 
     Trace::InstTracer * tracer;
     FaultInjector::Injector* injector;
-    bool didInject;
-    bool injNextPC;
-    Addr currPC;
-    Addr nextPC;
-    Tick prevTick;
+    bool shouldInject;
 
   public:
 

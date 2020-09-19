@@ -178,26 +178,15 @@ system = System(cpu = [CPUClass(cpu_id=i) for i in range(np)],
 
 if options.fi is not None:
     fi_commands = options.fi.split(',')
-    if len(fi_commands) != 8:
+    if len(fi_commands) != 3:
         print("Error: incorrect format format for fi option")
     else:
-        start_pc = UInt64(fi_commands[0])
-        end_pc = UInt64(fi_commands[1])
+        start_pc = String(fi_commands[0])
+        end_pc = String(fi_commands[1])
         isa = String(fi_commands[2])
-        inj_tick = Tick(fi_commands[3])
-        inj_reg = fi_commands[4]
-        inj_bit = Int(fi_commands[5])
-        reg_type = Int(fi_commands[6])
-        src_dest = Int(fi_commands[7])
         system.cpu[0].injector = Injector(startPC=start_pc,
                                    endPC=end_pc,
-                                   ISA=isa,
-                                   injTick=inj_tick,
-                                   injPC='',
-                                   injReg=inj_reg,
-                                   injBit=inj_bit,
-                                   regType=reg_type,
-                                   srcDest=src_dest)
+                                   ISA=isa)
 
 
 if numThreads > 1:

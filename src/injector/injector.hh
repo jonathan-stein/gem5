@@ -490,12 +490,6 @@ class Injector : public SimObject
     Addr startPC;
     Addr endPC;
     std::string ISA;
-    std::string injPC;
-    int injBit;
-    Tick injTick;
-    std::string injReg;
-    int regType;
-    int srcDest;
     Tick timeoutVal; // = 10000000000; // test timeout
     std::string goldenFile;
 

@@ -488,38 +488,6 @@ BaseSimpleCPU::preExecute()
     // decode the instruction
     TheISA::PCState pcState = thread->pcState();
 
-    if (!didInject && curTick() == injector->injTick && curTick() != 0)
-    {
-        printf("first\n");
-        if (injector->srcDest == 0)
-        {
-            printf("injecting!\n");
-            injector->PerformFI(thread->getTC(), curTick(), injector->injTick,
-                injector->ISA, injector->injReg, injector->injBit, injector->regType);
-            didInject = true;
-        }
-        else
-        {
-            currPC = pcState.instAddr();
-            injNextPC = true;
-        }
-    }
-    else if (!didInject && injNextPC)
-    {
-        printf("second\n");
-        nextPC = pcState.instAddr();
-        if (nextPC != currPC)
-        {
-            printf("injecting!\n");
-            injector->PerformFI(thread->getTC(), curTick(), injector->injTick,
-                injector->ISA, injector->injReg, injector->injBit, injector->regType);
-            didInject = true;
-        }
-    }
-    else if (didInject)
-    {
-    }
-
     if (isRomMicroPC(pcState.microPC())) {
         t_info.stayAtPC = false;
         curStaticInst = microcodeRom.fetchMicroop(pcState.microPC(),
@@ -683,6 +651,16 @@ BaseSimpleCPU::advancePC(const Fault &fault)
 {
     SimpleExecContext &t_info = *threadInfo[curThread];
     SimpleThread* thread = t_info.thread;
+    if (thread->pcState().pc() == injector->startPC)
+    {
+        shouldInject = true;
+        printf("reached start pc\n");
+    }
+    if (thread->pcState().pc() == injector->endPC)
+    {
+        shouldInject = false;
+        printf("reached end pc\n");
+    }
 
     const bool branching(thread->pcState().branching());
 
