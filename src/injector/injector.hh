@@ -487,6 +487,8 @@ class FI
 class Injector : public SimObject
 {    
   public:
+    Addr startPC;
+    Addr endPC;
     std::string ISA;
     std::string injPC;
     int injBit;

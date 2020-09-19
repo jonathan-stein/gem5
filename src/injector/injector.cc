@@ -48,6 +48,8 @@ void FI::FlipBit(Tick _injTick, int injR, int injBit, int regType)
 
 Injector::Injector(InjectorParams *params) : 
     SimObject(params),
+    startPC(params->startPC),
+    endPC(params->endPC),
     ISA(params->ISA),
     injPC(params->injPC),
     injBit(params->injBit),
