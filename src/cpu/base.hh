@@ -61,6 +61,7 @@
 #include "sim/probe/pmu.hh"
 #include "sim/probe/probe.hh"
 #include "sim/system.hh"
+#include "injector/injector.hh"
 #include "debug/Mwait.hh"
 
 class BaseCPU;
@@ -263,6 +264,12 @@ class BaseCPU : public ClockedObject
     std::vector<ThreadContext *> threadContexts;
 
     Trace::InstTracer * tracer;
+    FaultInjector::Injector* injector;
+    bool didInject;
+    bool injNextPC;
+    Addr currPC;
+    Addr nextPC;
+    Tick prevTick;
 
   public:
 

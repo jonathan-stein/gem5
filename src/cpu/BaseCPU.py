@@ -55,6 +55,7 @@ from m5.objects.CPUTracers import ExeTracer
 from m5.objects.SubSystem import SubSystem
 from m5.objects.ClockDomain import *
 from m5.objects.Platform import Platform
+from m5.objects.Injector import Injector
 
 default_tracer = ExeTracer()
 
@@ -177,6 +178,7 @@ class BaseCPU(ClockedObject):
         "between CPU models)")
 
     tracer = Param.InstTracer(default_tracer, "Instruction tracer")
+    injector = Param.Injector(Injector(), "fault injector")
 
     icache_port = MasterPort("Instruction Port")
     dcache_port = MasterPort("Data Port")
