@@ -488,6 +488,14 @@ BaseSimpleCPU::preExecute()
     // decode the instruction
     TheISA::PCState pcState = thread->pcState();
 
+    // inject error into last instruction's destination register
+    if (injectNextPC && pcState.instAddr() != currPC) {
+        injectNextPC = false;
+        printf("perform injection\n");
+        // injector->PerformFI(thread->getTC(), curTick(), curTick(),
+        //     injector->ISA, injReg, 2, 1); // flip bit 2
+    }
+
     if (isRomMicroPC(pcState.microPC())) {
         t_info.stayAtPC = false;
         curStaticInst = microcodeRom.fetchMicroop(pcState.microPC(),
@@ -567,6 +575,14 @@ BaseSimpleCPU::postExecute()
 
     TheISA::PCState pc = threadContexts[curThread]->pcState();
     Addr instAddr = pc.instAddr();
+
+    if (inMain && curStaticInst->isFloating()) {
+        // add if randNumber < 0.99 or something here
+        injectNextPC = true;
+        currPC = instAddr;
+        injReg = curStaticInst->destRegIdx(0).index(); // not sure if this is the register index we want yet
+    }
+
     if (FullSystem && thread->profile) {
         bool usermode = TheISA::inUserMode(threadContexts[curThread]);
         thread->profilePC = usermode ? 1 : instAddr;
@@ -653,12 +669,12 @@ BaseSimpleCPU::advancePC(const Fault &fault)
     SimpleThread* thread = t_info.thread;
     if (thread->pcState().pc() == injector->startPC)
     {
-        shouldInject = true;
+        inMain = true;
         printf("reached start pc\n");
     }
     if (thread->pcState().pc() == injector->endPC)
     {
-        shouldInject = false;
+        inMain = false;
         printf("reached end pc\n");
     }
 

@@ -497,7 +497,7 @@ class Injector : public SimObject
 
     Injector(InjectorParams *p);
     void PerformFI(ThreadContext* _thread, Tick _when,
-                   Tick _injTick, std::string ISA, std::string desiredR, int injBit, int regType);
+                   Tick _injTick, std::string ISA, int injR, int injBit, int regType);
     void trackState(std::string faultyTrace, std::string goldenTrace);
 };
 

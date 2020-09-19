@@ -60,10 +60,10 @@ Injector::Injector(InjectorParams *params) :
 }
 
 void Injector::PerformFI(ThreadContext* _thread, Tick _when, 
-                      Tick _injTick, std::string ISA, std::string desiredR, int injBit, int regType)
+                      Tick _injTick, std::string ISA, int injR, int injBit, int regType)
 {
     FI fi(_thread, _when, ISA);
-    int injR = archMap[ISA][regType][desiredR];
+    //int injR = archMap[ISA][regType][desiredR];
     fi.FlipBit(_when, injR, injBit, regType);
 }
 

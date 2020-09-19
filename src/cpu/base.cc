@@ -189,7 +189,10 @@ BaseCPU::BaseCPU(Params *p, bool is_checker)
     }
     tracer = params()->tracer;
     injector = params()->injector;
-    shouldInject = false;
+    inMain = false;
+    injectNextPC = false;
+    currPC = 0;
+    injReg = 0;
 
     if (params()->isa.size() != numThreads) {
         fatal("Number of ISAs (%i) assigned to the CPU does not equal number "
