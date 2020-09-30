@@ -23,7 +23,8 @@ void FI::FlipBit(Tick _injTick, int injR, int injBit, int regType)
     else if (regType == 1)  // floating point register
     {
         currVal = thread->readFloatReg(injR);
-        thread->setFloatReg(injR, currVal ^ bitMask);
+        // thread->setFloatReg(injR, currVal ^ bitMask);
+        thread->setFloatReg(injR, ~currVal);
     }
     else if (regType == 2)  // double precision register (SPARC)
     {
