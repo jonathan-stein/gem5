@@ -492,7 +492,7 @@ BaseSimpleCPU::preExecute()
     if (injectNextPC && pcState.instAddr() != currPC) { 
         injectNextPC = false;
         injector->PerformFI(thread->getTC(), curTick(), curTick(),
-           injector->ISA, injReg, 30, 1); // flip bit 30
+           injReg, 30, 1); // flip bit 30
     }
 
     if (isRomMicroPC(pcState.microPC())) {

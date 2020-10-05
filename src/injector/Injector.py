@@ -8,6 +8,3 @@ class Injector(SimObject):
 
     startPC = Param.String("0", "starting PC of main")
     endPC = Param.String("0", "ending PC of main")
-    ISA = Param.String("", "target ISA to perform injection")
-    timeout = Param.Tick(500000000000, "timeout ticks")
-    goldenFile = Param.String("", "Filename of golden trace")

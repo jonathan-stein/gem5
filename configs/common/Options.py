@@ -479,8 +479,4 @@ def addFSOptions(parser):
 def addFIOptions(parser):
     # Fault Injector Options
     parser.add_option("--fi", action="store", type="string", default=None,
-                      help="Fault Injection Format: [startPC],[endPC],[isa]")
-    parser.add_option("--timeout", action="store", type="string", default=None,
-                      help="add timeout value to fault injector")
-    parser.add_option("--golden-file", action="store", type="string", default=None,
-                      help="golden trace file to examine")
+                      help="Fault Injection Format: [startPC],[endPC]")
