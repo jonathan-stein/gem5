@@ -11,6 +11,7 @@
 #include "cpu/inst_seq.hh"
 #include "cpu/static_inst.hh"
 
+#include <random>
 class ThreadContext;
 
 
@@ -183,6 +184,10 @@ class Injector : public SimObject
   public:
     Addr startPC;
     Addr endPC;
+    double reliability;
+    std::random_device rd;
+    std::mt19937 gen;
+    std::uniform_real_distribution<double> dis;
 
     Injector(InjectorParams *p);
     void PerformFI(ThreadContext* _thread, Tick _when,

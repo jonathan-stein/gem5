@@ -574,7 +574,6 @@ BaseSimpleCPU::postExecute()
             (instOpClass >= OpClass::SimdFloatAdd && instOpClass <= OpClass::SimdFloatSqrt) ||
             (instOpClass >= OpClass::SimdFloatReduceAdd && instOpClass <= OpClass::SimdFloatReduceCmp))
         {
-            // add if randNumber < 0.99 or something here
             injReg = curStaticInst->destRegIdx(0).index(); // not sure if this is the register index we want yet
             injector->PerformFI(thread->getTC(), curTick(), curTick(),
                 injReg, 30, 1); // flip bit 30

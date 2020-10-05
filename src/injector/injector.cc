@@ -50,7 +50,10 @@ void FI::FlipBit(Tick _injTick, int injR, int injBit, int regType)
 Injector::Injector(InjectorParams *params) : 
     SimObject(params),
     startPC(strtoul(params->startPC.c_str(), NULL, 16)),
-    endPC(strtoul(params->endPC.c_str(), NULL, 16))
+    endPC(strtoul(params->endPC.c_str(), NULL, 16)),
+    reliability(params->reliability),
+    gen(rd()),
+    dis(0.0, 1.0)
 {
     //DPRINTF("Testing object!\n");
     printf("start pc: %ld\n", startPC);
@@ -60,9 +63,10 @@ Injector::Injector(InjectorParams *params) :
 void Injector::PerformFI(ThreadContext* _thread, Tick _when, 
                       Tick _injTick, int injR, int injBit, int regType)
 {
-    FI fi(_thread, _when);
-    //int injR = archMap[ISA][regType][desiredR];
-    fi.FlipBit(_when, injR, injBit, regType);
+    if (dis(gen) > reliability) {
+        FI fi(_thread, _when);
+        fi.FlipBit(_when, injR, injBit, regType);
+    }
 }
 
 }   // end namespace
