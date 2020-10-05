@@ -568,7 +568,7 @@ BaseSimpleCPU::postExecute()
     TheISA::PCState pc = threadContexts[curThread]->pcState();
     Addr instAddr = pc.instAddr();
 
-    if (inMain && curStaticInst->isLastMicroop() && curStaticInst->isFloating() && curStaticInst->numDestRegs() > 0) {
+    if (inMain && curStaticInst->isFloating() && curStaticInst->numDestRegs() > 0) {
         OpClass instOpClass = curStaticInst->opClass();
         if ((instOpClass >= OpClass::FloatAdd && instOpClass <= OpClass::FloatSqrt) || 
             (instOpClass >= OpClass::SimdFloatAdd && instOpClass <= OpClass::SimdFloatSqrt) ||
