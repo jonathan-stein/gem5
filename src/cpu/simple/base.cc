@@ -488,13 +488,6 @@ BaseSimpleCPU::preExecute()
     // decode the instruction
     TheISA::PCState pcState = thread->pcState();
 
-    // // inject error into last instruction's destination register
-    if (injectNextPC && pcState.instAddr() != currPC) { 
-        injectNextPC = false;
-        injector->PerformFI(thread->getTC(), curTick(), curTick(),
-           injReg, 30, 1); // flip bit 30
-    }
-
     if (isRomMicroPC(pcState.microPC())) {
         t_info.stayAtPC = false;
         curStaticInst = microcodeRom.fetchMicroop(pcState.microPC(),
@@ -582,9 +575,9 @@ BaseSimpleCPU::postExecute()
             (instOpClass >= OpClass::SimdFloatReduceAdd && instOpClass <= OpClass::SimdFloatReduceCmp))
         {
             // add if randNumber < 0.99 or something here
-            injectNextPC = true;
-            currPC = instAddr;
             injReg = curStaticInst->destRegIdx(0).index(); // not sure if this is the register index we want yet
+            injector->PerformFI(thread->getTC(), curTick(), curTick(),
+                injReg, 30, 1); // flip bit 30
             if (curMacroStaticInst) {
                 printf("program counter: %08lx\n", instAddr);
                 std::cout << "macro inst: " << curMacroStaticInst->disassemble(instAddr) << std::endl;
