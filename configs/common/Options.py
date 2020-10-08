@@ -478,5 +478,6 @@ def addFSOptions(parser):
 
 def addFIOptions(parser):
     # Fault Injector Options
-    parser.add_option("--fi", action="store", type="string", default=None,
-                      help="Fault Injection Format: [startPC],[endPC],[reliability]")
+    parser.add_option("--fi-reliability", action="store", type="float",
+                    default=1.0,
+                    help="Specify the reliability of an instruction.")
