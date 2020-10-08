@@ -568,22 +568,9 @@ BaseSimpleCPU::postExecute()
     TheISA::PCState pc = threadContexts[curThread]->pcState();
     Addr instAddr = pc.instAddr();
 
-    if (inMain && curStaticInst->isFloating() && curStaticInst->numDestRegs() > 0) {
-        OpClass instOpClass = curStaticInst->opClass();
-        if ((instOpClass >= OpClass::FloatAdd && instOpClass <= OpClass::FloatSqrt) || 
-            (instOpClass >= OpClass::SimdFloatAdd && instOpClass <= OpClass::SimdFloatSqrt) ||
-            (instOpClass >= OpClass::SimdFloatReduceAdd && instOpClass <= OpClass::SimdFloatReduceCmp))
-        {
-            injReg = curStaticInst->destRegIdx(0).index(); // not sure if this is the register index we want yet
-            injector->PerformFI(thread->getTC(), curTick(), curTick(),
-                injReg, 30, 1); // flip bit 30
-            if (curMacroStaticInst) {
-                printf("program counter: %08lx\n", instAddr);
-                std::cout << "macro inst: " << curMacroStaticInst->disassemble(instAddr) << std::endl;
-                std::cout << "opClass: " << instOpClass << std::endl;
-            }
-        }
-    }
+    // We invoke the fault injection (FI) hook every time we finish executing a micro instruction.
+    // Note that invoking performFI() does not necessarily inject errors.
+    injector->performFI(thread->getTC(), instAddr, curStaticInst, curMacroStaticInst);
 
     if (FullSystem && thread->profile) {
         bool usermode = TheISA::inUserMode(threadContexts[curThread]);
@@ -669,16 +656,6 @@ BaseSimpleCPU::advancePC(const Fault &fault)
 {
     SimpleExecContext &t_info = *threadInfo[curThread];
     SimpleThread* thread = t_info.thread;
-    if (thread->pcState().pc() == injector->startPC)
-    {
-        inMain = true;
-        printf("reached start pc\n");
-    }
-    if (thread->pcState().pc() == injector->endPC)
-    {
-        inMain = false;
-        printf("reached end pc\n");
-    }
 
     const bool branching(thread->pcState().branching());
 
@@ -690,8 +667,13 @@ BaseSimpleCPU::advancePC(const Fault &fault)
         thread->decoder.reset();
     } else {
         if (curStaticInst) {
-            if (curStaticInst->isLastMicroop())
+            if (curStaticInst->isLastMicroop()) {
+                // PC will be incremented only if curStaticInst is the last
+                // microop corresponding to the current macro. Therefore,
+                // only invoke advancePC when curStaticInst->isLastMicroop().
+                injector->advancePC(thread->pcState().pc());
                 curMacroStaticInst = StaticInst::nullStaticInstPtr;
+            }
             TheISA::PCState pcState = thread->pcState();
             TheISA::advancePC(pcState, curStaticInst);
             thread->pcState(pcState);

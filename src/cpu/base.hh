@@ -265,8 +265,6 @@ class BaseCPU : public ClockedObject
 
     Trace::InstTracer * tracer;
     FaultInjector::Injector* injector;
-    bool inMain;
-    int injReg;
 
   public:
 

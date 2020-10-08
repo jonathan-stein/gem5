@@ -1,3 +1,6 @@
+// The fault injector that is invoked at every execution cycle.
+// Author: Jonathan Stein, Ziang Wan
+
 #ifndef __TEST_OBJ_TEST_OBJECT_HH__
 #define __TEST_OBJ_TEST_OBJECT_HH__
 
@@ -6,14 +9,13 @@
 
 #include "arch/x86/regs/int.hh"
 #include "arch/x86/regs/float.hh"
-//#include "base/bigint.hh"
+// #include "base/bigint.hh"
 #include "base/types.hh"
 #include "cpu/inst_seq.hh"
 #include "cpu/static_inst.hh"
 
 #include <random>
 class ThreadContext;
-
 
 
 namespace FaultInjector {
@@ -165,38 +167,36 @@ static std::map<std::string, std::vector<std::map<std::string, int>>> archMap =
     {"x86", x86Table},
 };
 
-// TODO: add PC (thread->instAddr())
-class FI
-{
-  protected:
-    Tick when;
-    ThreadContext* thread;
-  public:
-    FI(ThreadContext* _thread, Tick _when)
-        : when(_when), thread(_thread)
-    { }
-    void FlipBit(Tick _injTick, int injR, int injBit, int regType);
 
-};
-
-class Injector : public SimObject
-{    
+class Injector : public SimObject {    
   public:
+    Injector(InjectorParams *p);
+
+    void advancePC(Addr nextPC);
+    void performFI(ThreadContext* thread,
+        Addr instAddr,
+        StaticInstPtr curStaticInst,
+        StaticInstPtr curMacroStaticInst);
+
+  private:
     Addr startPC;
     Addr endPC;
+    bool inMain;
+
+    // Specify instruction-level reliability.
     double reliability;
+    
+    // A random number generator in the range of [0.0, 1.0].
     std::random_device rd;
     std::mt19937 gen;
     std::uniform_real_distribution<double> dis;
 
-    Injector(InjectorParams *p);
-    void PerformFI(ThreadContext* _thread, Tick _when,
-                   Tick _injTick, int injR, int injBit, int regType);
+  private:
+    // Helper functions
+    void flipBit(ThreadContext* thread, int injR, int injBit, int regType);
 };
 
-}   // end namespace
-
-
+} // namespace FaultInjector
 
 
 #endif
