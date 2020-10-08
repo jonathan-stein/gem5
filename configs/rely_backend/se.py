@@ -174,9 +174,6 @@ system.cpu[0].createThreads()
 # Get the start and end Program Counter for the main function, which
 # defines the range we will inject error.
 start_pc, end_pc = get_start_end_pc(options.cmd)
-print(start_pc, end_pc)
-print(options.fi_reliability)
-
 system.cpu[0].injector = Injector(
     startPC=start_pc, endPC=end_pc, reliability=options.fi_reliability)
 
