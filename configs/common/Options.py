@@ -481,3 +481,6 @@ def addFIOptions(parser):
     parser.add_option("--fi-reliability", action="store", type="float",
                     default=1.0,
                     help="Specify the reliability of an instruction.")
+    parser.add_option("--function_name", action="store", type="string",
+                    default="<main>",
+                    help="Specify the function to inject errors in")

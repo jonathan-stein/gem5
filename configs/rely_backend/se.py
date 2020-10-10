@@ -88,19 +88,19 @@ def get_workload(options):
     return process
 
 
-def get_start_end_pc(cmd):
-    assembly = subprocess.check_output(["objdump", "-d", cmd]).split("\n")
+def get_start_end_pc(cmd, function_name):
+    assembly = str(subprocess.check_output(["objdump", "-d", cmd])).split("\\n")
     start_pc = None
     end_pc = None
-    in_main = False
+    in_func = False
     for line in assembly:
-        if in_main and start_pc is None:
+        if in_func and start_pc is None:
             start_pc = line.split()[0][:-1]
-        if "<main>" in line:
-            in_main = True
-        if in_main and "ret" in line:
+        if function_name in line:
+            in_func = True
+        if in_func and "ret" in line:
             end_pc = line.split()[0][:-1]
-            in_main = False
+            in_func = False
     return start_pc, end_pc
 
 
@@ -173,7 +173,7 @@ system.cpu[0].createThreads()
 
 # Get the start and end Program Counter for the main function, which
 # defines the range we will inject error.
-start_pc, end_pc = get_start_end_pc(options.cmd)
+start_pc, end_pc = get_start_end_pc(options.cmd, options.function_name)
 system.cpu[0].injector = Injector(
     startPC=start_pc, endPC=end_pc, reliability=options.fi_reliability)
 
