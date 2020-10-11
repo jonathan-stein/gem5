@@ -37,9 +37,9 @@ void Injector::performFI(ThreadContext* thread,
     return;
   }
 
-  std::cout << std::hex << instAddr << std::dec << ": "
+  //std::cout << std::hex << instAddr << std::dec << ": "
   // << curMacroStaticInst->disassemble(instAddr) << "\t\t"
-      << curStaticInst->disassemble(instAddr) << std::endl;
+  //    << curStaticInst->disassemble(instAddr) << std::endl;
 
   if (curStaticInst->isFloating() && curStaticInst->numDestRegs() > 0) {
     OpClass instOpClass = curStaticInst->opClass();
@@ -48,6 +48,8 @@ void Injector::performFI(ThreadContext* thread,
         (instOpClass >= OpClass::SimdFloatReduceAdd && instOpClass <= OpClass::SimdFloatReduceCmp)) {
       if (dis(gen) > reliability) {
         std::cout << "Inject!" << std::endl;
+        std::cout << std::hex << instAddr << std::dec << ": "
+          << curMacroStaticInst->disassemble(instAddr) << std::endl;
         // not sure if this is the register index we want yet.
         // Inject at bit 30.
         int injReg = curStaticInst->destRegIdx(0).index();

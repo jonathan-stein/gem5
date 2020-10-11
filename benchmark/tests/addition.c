@@ -8,7 +8,7 @@ int main() {
     float a = 1.3;
     float b = 3.4;
     float result = add(a, b);
-    printf("%f\n", result);
+    printf("Result: %f\n", result);
     return 0;
 }
 
