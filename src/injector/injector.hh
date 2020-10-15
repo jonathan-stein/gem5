@@ -194,6 +194,10 @@ class Injector : public SimObject {
   private:
     // Helper functions
     void flipBit(ThreadContext* thread, int injR, int injBit, int regType);
+
+    void printInst(Addr instAddr,
+        StaticInstPtr curStaticInst,
+        StaticInstPtr curMacroStaticInst);
 };
 
 } // namespace FaultInjector

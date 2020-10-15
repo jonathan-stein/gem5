@@ -22,10 +22,12 @@ Injector::Injector(InjectorParams *params) :
 void Injector::advancePC(Addr nextPC) {
   if (nextPC == this->startPC) {
     inMain = true;
-    printf("reached start pc: %ld\n", this->startPC);
+    std::cout << "[INFO] Reach start PC " << std::hex
+      << this->startPC << std::dec << std::endl;
   } else if (nextPC == this->endPC) {
     inMain = false;
-    printf("reached end pc: %ld\n", this->endPC);
+    std::cout << "[INFO] Reach end PC " << std::hex
+      << this->startPC << std::dec << std::endl;
   }
 }
 
@@ -37,9 +39,8 @@ void Injector::performFI(ThreadContext* thread,
     return;
   }
 
-  //std::cout << std::hex << instAddr << std::dec << ": "
-  // << curMacroStaticInst->disassemble(instAddr) << "\t\t"
-  //    << curStaticInst->disassemble(instAddr) << std::endl;
+  std::cout << "[EXEC] ";
+  this->printInst(instAddr, curStaticInst, curMacroStaticInst);
 
   if (curStaticInst->isFloating() && curStaticInst->numDestRegs() > 0) {
     OpClass instOpClass = curStaticInst->opClass();
@@ -47,11 +48,10 @@ void Injector::performFI(ThreadContext* thread,
         (instOpClass >= OpClass::SimdFloatAdd && instOpClass <= OpClass::SimdFloatSqrt) ||
         (instOpClass >= OpClass::SimdFloatReduceAdd && instOpClass <= OpClass::SimdFloatReduceCmp)) {
       if (dis(gen) > reliability) {
-        std::cout << "Inject!" << std::endl;
-        std::cout << std::hex << instAddr << std::dec << ": "
-          << curMacroStaticInst->disassemble(instAddr) << std::endl;
-        // not sure if this is the register index we want yet.
-        // Inject at bit 30.
+        std::cout << "[INJE] ";
+        this->printInst(instAddr, curStaticInst, curMacroStaticInst);
+
+        // not sure if this is the register index we want yet; Inject at bit 30.
         int injReg = curStaticInst->destRegIdx(0).index();
         this->flipBit(thread, injReg, 30, 1);
       }
@@ -59,39 +59,55 @@ void Injector::performFI(ThreadContext* thread,
   }
 }
 
+/*
+ * Helper Functions
+ */
+
+// TODO: We may need a better error injection function.
 void Injector::flipBit(ThreadContext* thread, int injR, int injBit, int regType) {
-  uint64_t currVal; // = thread->readIntReg(injR);
+  uint64_t currVal;
   uint64_t bitMask = 1 << injBit;
 
-  if (regType == 0)
-  {
+  if (regType == 0) {
+    // Integer registers.
     currVal = thread->readIntReg(injR); 
-    thread->setIntReg(injR, currVal ^ bitMask); // flip bit using mask
-  }
-  else if (regType == 1)  // floating point register
-  {
+    thread->setIntReg(injR, currVal ^ bitMask);
+  } else if (regType == 1) {
+    // Floating point register.
     currVal = thread->readFloatReg(injR);
     // thread->setFloatReg(injR, currVal ^ bitMask);
     thread->setFloatReg(injR, ~currVal);
-  }
-  else if (regType == 2)  // double precision register (SPARC)
-  {
+  } else if (regType == 2) {
+    // Double precision registers (SPARC).
     bool upper = false;
-    if (injBit >= 32) // flipping higher order bits
-    {
+
+    // flipping higher order bits
+    if (injBit >= 32) { 
       upper = true;
       bitMask = 1 << (injBit - 32);
     }
-    if (upper)
-    {
+
+    if (upper) {
       currVal = thread->readFloatReg(injR);
       thread->setFloatReg(injR, currVal ^ bitMask);
-    }
-    else
-    {
+    } else {
       currVal = thread->readFloatReg(injR+1);
       thread->setFloatReg(injR+1, currVal ^ bitMask);
     }
+  }
+}
+
+void Injector::printInst(Addr instAddr,
+    StaticInstPtr curStaticInst,
+    StaticInstPtr curMacroStaticInst) {
+  if (curMacroStaticInst) {
+    std::cout << std::hex << instAddr << std::dec << ": Macro ["
+      << curMacroStaticInst->disassemble(instAddr) << "] Micro ["
+      << curStaticInst->disassemble(instAddr) << "]" << std::endl;
+  } else {
+    std::cout << std::hex << instAddr << std::dec
+      << ": Macro [None] Micro ["
+      << curStaticInst->disassemble(instAddr) << "]" << std::endl;
   }
 }
 
