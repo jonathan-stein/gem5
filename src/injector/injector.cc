@@ -31,7 +31,7 @@ void Injector::advancePC(Addr nextPC) {
   } else if (nextPC == this->endPC) {
     if (inMain && verbose) {
       std::cout << "[INFO] Reach end PC " << std::hex
-        << this->startPC << std::dec << std::endl;
+        << this->endPC << std::dec << std::endl;
     }
 
     inMain = false;
@@ -58,8 +58,7 @@ void Injector::performFI(ThreadContext* thread,
         (instOpClass >= OpClass::SimdFloatReduceAdd && instOpClass <= OpClass::SimdFloatReduceCmp)) {
       if (dis(gen) > reliability) {
         if (verbose) {
-          std::cout << "[INJE] ";
-          this->printInst(instAddr, curStaticInst, curMacroStaticInst);
+          std::cout << "[INJE]" << std::endl;
         }
 
         // not sure if this is the register index we want yet; Inject at bit 30.
