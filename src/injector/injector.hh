@@ -182,6 +182,7 @@ class Injector : public SimObject {
     Addr startPC;
     Addr endPC;
     bool inMain;
+    bool verbose;
 
     // Specify instruction-level reliability.
     double reliability;

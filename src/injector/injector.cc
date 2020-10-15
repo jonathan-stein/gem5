@@ -15,22 +15,25 @@ Injector::Injector(InjectorParams *params) :
     startPC(strtoul(params->startPC.c_str(), NULL, 16)),
     endPC(strtoul(params->endPC.c_str(), NULL, 16)),
     inMain(false),
+    verbose(params->verbose),
     reliability(params->reliability),
     gen(rd()),
     dis(0.0, 1.0) {}
 
 void Injector::advancePC(Addr nextPC) {
   if (nextPC == this->startPC) {
-    if (!inMain) {
+    if (!inMain && verbose) {
       std::cout << "[INFO] Reach start PC " << std::hex
         << this->startPC << std::dec << std::endl;
     }
+
     inMain = true;
   } else if (nextPC == this->endPC) {
-    if (inMain) {
+    if (inMain && verbose) {
       std::cout << "[INFO] Reach end PC " << std::hex
         << this->startPC << std::dec << std::endl;
     }
+
     inMain = false;
   }
 }
@@ -43,8 +46,10 @@ void Injector::performFI(ThreadContext* thread,
     return;
   }
 
-  std::cout << "[EXEC] ";
-  this->printInst(instAddr, curStaticInst, curMacroStaticInst);
+  if (verbose) {
+    std::cout << "[EXEC] ";
+    this->printInst(instAddr, curStaticInst, curMacroStaticInst);
+  }
 
   if (curStaticInst->isFloating() && curStaticInst->numDestRegs() > 0) {
     OpClass instOpClass = curStaticInst->opClass();
@@ -52,8 +57,10 @@ void Injector::performFI(ThreadContext* thread,
         (instOpClass >= OpClass::SimdFloatAdd && instOpClass <= OpClass::SimdFloatSqrt) ||
         (instOpClass >= OpClass::SimdFloatReduceAdd && instOpClass <= OpClass::SimdFloatReduceCmp)) {
       if (dis(gen) > reliability) {
-        std::cout << "[INJE] ";
-        this->printInst(instAddr, curStaticInst, curMacroStaticInst);
+        if (verbose) {
+          std::cout << "[INJE] ";
+          this->printInst(instAddr, curStaticInst, curMacroStaticInst);
+        }
 
         // not sure if this is the register index we want yet; Inject at bit 30.
         int injReg = curStaticInst->destRegIdx(0).index();

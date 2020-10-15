@@ -9,3 +9,4 @@ class Injector(SimObject):
     startPC = Param.String("0", "starting PC of main")
     endPC = Param.String("0", "ending PC of main")
     reliability = Param.Float(1.0, "FPU reliability")
+    verbose = Param.Bool(False, "Verbose")
