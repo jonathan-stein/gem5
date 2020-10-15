@@ -668,14 +668,14 @@ BaseSimpleCPU::advancePC(const Fault &fault)
     } else {
         if (curStaticInst) {
             if (curStaticInst->isLastMicroop()) {
-                // PC will be incremented only if curStaticInst is the last
-                // microop corresponding to the current macro. Therefore,
-                // only invoke advancePC when curStaticInst->isLastMicroop().
-                injector->advancePC(thread->pcState().pc());
                 curMacroStaticInst = StaticInst::nullStaticInstPtr;
             }
             TheISA::PCState pcState = thread->pcState();
             TheISA::advancePC(pcState, curStaticInst);
+            // We should call injector->advancePC after TheISA::advancePC.
+            // If curPC is not changed, we might call advancePC multiple times
+            // with the same PC value. Despite its overhead, it is okay to do so.
+            injector->advancePC(thread->pcState().pc());
             thread->pcState(pcState);
         }
     }

@@ -21,13 +21,17 @@ Injector::Injector(InjectorParams *params) :
 
 void Injector::advancePC(Addr nextPC) {
   if (nextPC == this->startPC) {
+    if (!inMain) {
+      std::cout << "[INFO] Reach start PC " << std::hex
+        << this->startPC << std::dec << std::endl;
+    }
     inMain = true;
-    std::cout << "[INFO] Reach start PC " << std::hex
-      << this->startPC << std::dec << std::endl;
   } else if (nextPC == this->endPC) {
+    if (inMain) {
+      std::cout << "[INFO] Reach end PC " << std::hex
+        << this->startPC << std::dec << std::endl;
+    }
     inMain = false;
-    std::cout << "[INFO] Reach end PC " << std::hex
-      << this->startPC << std::dec << std::endl;
   }
 }
 
