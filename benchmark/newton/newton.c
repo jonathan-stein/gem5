@@ -1,7 +1,7 @@
 /* Benchmark Application in C.
  * The error injection function is newton.
  *
- * Finding a root of a given function:
+ * Finding a root of a given function using Newton's method:
  * f(x) = x^2 - 2x + 1.
  * df(x) = 2x - 2
  *
