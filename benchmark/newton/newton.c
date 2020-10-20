@@ -1,4 +1,4 @@
-/* Benchmark Application 2 in C.
+/* Benchmark Application in C.
  *
  * Finding a root of a given function:
  * f(x) = x^2 - 2x + 1.
@@ -19,7 +19,6 @@ float df(const float x) {
 	const float dfx = 2.0f * x - 2.0f;
 	return dfx;
 }
-
 
 // The newton method.
 static const float tolerance = 0.00001f;
@@ -46,7 +45,7 @@ float newton(const float xStart) {
 int main() {
 	float xStart = 0.0f;
 	float answer = newton(xStart);
-	printf("Answer is %f\n", answer);
+	printf("Result: %f\n", answer);
 	return 0;
 }
 
