@@ -116,6 +116,9 @@ int main(int argc, char* argv[]) {
     }
     printf("\n");
 
+    for (int i = 0; i < n; i++) {
+        free(A[i]);
+    }
     free(A);
     free(b);
     free(phi);
