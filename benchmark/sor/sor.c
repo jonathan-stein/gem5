@@ -84,6 +84,7 @@ int main(int argc, char* argv[]) {
   }
   float *b = malloc(n * sizeof(float));
   float *phi = malloc(n * sizeof(float));
+  
   A[0][0] = 4;
   A[0][1] = -1;
   A[0][2] = -6;

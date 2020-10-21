@@ -24,13 +24,8 @@ void matvec(float **A, float *x, float *b, const int m, const int n) {
 
 
 int main(int argc, char* argv[]) {
-  if (argc != 3) {
-    fprintf(stderr, "Usage: .\\matvec m n\n");
-    return -1;
-  }
-
-  const int m = atoi(argv[1]);
-  const int n = atoi(argv[2]);
+  const int m = 10;
+  const int n = 5;
 
   // Ax = b. row-major memory allocation.
   float **A = malloc(m * sizeof(float*));
