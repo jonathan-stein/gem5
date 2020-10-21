@@ -1,5 +1,7 @@
 /* Benchmark Application in C.
  * The error injection function is blacsholes.
+ * The error injection function contains library calls.
+ * Compile it with: clang blacksholes.c -lm
  * 
  * The C function to compute the cumulative normal distribution is adopted from
  * https://stackoverflow.com/questions/2328258/cumulative-normal-distribution-function-in-c-c
@@ -36,17 +38,35 @@ double CNDF(double x) {
   return 0.5 * (1.0 + sign*y);
 }
 
+// The main function: blacksholes.
+// Calculate the price of a call option based on the parameters.
+double blacksholes(const double stockPrice,
+    const double exercisePrice,
+    const double riskFreeInterest,
+    const double timeToExpiration,
+    const double volatility) {
+  const double d1 = (log(stockPrice / exercisePrice) +
+      (riskFreeInterest + volatility * volatility / 2) * timeToExpiration) /
+      (volatility * sqrt(timeToExpiration));
+  const double d2 = (log(stockPrice / exercisePrice) +
+      (riskFreeInterest - volatility * volatility / 2) * timeToExpiration) /
+      (volatility * sqrt(timeToExpiration));
+  const double callPrice = stockPrice * CNDF(d1) -
+      exercisePrice * exp(-riskFreeInterest * timeToExpiration) * CNDF(d2);
+  return callPrice;
+}
 
-// The main function.
+
 int main(int argc, char *argv[]) {
-  if (argc != 6) {
-    fprintf(stderr, "Usage: ./blacksholes stockPrice exercisePrice riskFreeInterest timeToExpire volatility\n");
-    return -1;
-  }
+  const double stockPrice = 150.0;
+  const double exercisePrice = 160.0;
+  const double riskFreeInterest = 0.02;
+  const double timeToExpiration = 10.0;
+  const double volatility = 0.05;
 
-  const float stockPrice = strtof(argv[1], NULL);
-  const float exercisePrice = strtof(argv[2], NULL);
-  const float riskFreeInterest = strtof(argv[3], NULL);
-
+  // The result call price should be 21.406580.
+  const double callPrice = blacksholes(stockPrice, exercisePrice, riskFreeInterest,
+      timeToExpiration, volatility);
+  printf("Result: %f\n", callPrice);
   return 0;
 }
