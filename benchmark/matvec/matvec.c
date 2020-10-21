@@ -12,7 +12,7 @@
 
 // The main function: matrix vector multiplication.
 // Ax = b. A: m*n, x: n*1, b: m*1
-void matvec(float **A, float *x, float *b, int m, int n) {
+void matvec(float **A, float *x, float *b, const int m, const int n) {
   for (int row = 0; row < m; row += 1) {
     float sum = 0;
     for (int col = 0; col < n; col += 1) {

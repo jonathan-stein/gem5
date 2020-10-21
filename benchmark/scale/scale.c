@@ -20,8 +20,8 @@
 
 
 // The main function: scale a image.
-void scale(uint8_t *image, int width, int height, int channel,
-    uint8_t *scaleImage, float scaleRatio) {
+void scale(uint8_t *image, const int width, const int height, const int channel,
+    uint8_t *scaleImage, const float scaleRatio) {
   const int scaleWidth = width * scaleRatio;
   const int scaleHeight = height * scaleRatio;
 
