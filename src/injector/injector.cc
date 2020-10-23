@@ -16,7 +16,8 @@ Injector::Injector(InjectorParams *params) :
     endPC(strtoul(params->endPC.c_str(), NULL, 16)),
     inMain(false),
     verbose(params->verbose),
-    reliability(params->reliability),
+    fpuReliability(params->fpuReliability),
+    aluReliability(params->aluReliability),
     gen(rd()),
     dis(0.0, 1.0) {}
 
@@ -56,14 +57,25 @@ void Injector::performFI(ThreadContext* thread,
     if ((instOpClass >= OpClass::FloatAdd && instOpClass <= OpClass::FloatSqrt) || 
         (instOpClass >= OpClass::SimdFloatAdd && instOpClass <= OpClass::SimdFloatSqrt) ||
         (instOpClass >= OpClass::SimdFloatReduceAdd && instOpClass <= OpClass::SimdFloatReduceCmp)) {
-      if (dis(gen) > reliability) {
+      if (dis(gen) > fpuReliability) {
         if (verbose) {
           std::cout << "[INJE]" << std::endl;
         }
 
-        // not sure if this is the register index we want yet; Inject at bit 30.
         int injReg = curStaticInst->destRegIdx(0).index();
         this->flipBit(thread, injReg, 30, 1);
+      }
+    }
+  } else if (curStaticInst->isInteger() && curStaticInst->numDestRegs() > 0) {
+    OpClass instOpClass = curStaticInst->opClass();
+    if (instOpClass == OpClass::IntAlu || instOpClass == OpClass::SimdAlu || instOpClass == OpClass::SimdPredAlu || instOpClass == OpClass::SimdReduceAlu) {
+      if (dis(gen) > aluReliability) {
+        if (verbose) {
+          std::cout << "[INJE]" << std::endl;
+        }
+
+        int injReg = curStaticInst->destRegIdx(0).index();
+        this->flipBit(thread, injReg, 30, 0);
       }
     }
   }
@@ -81,7 +93,8 @@ void Injector::flipBit(ThreadContext* thread, int injR, int injBit, int regType)
   if (regType == 0) {
     // Integer registers.
     currVal = thread->readIntReg(injR); 
-    thread->setIntReg(injR, currVal ^ bitMask);
+    //thread->setIntReg(injR, currVal ^ bitMask);
+    thread->setIntReg(injR, ~currVal);
   } else if (regType == 1) {
     // Floating point register.
     currVal = thread->readFloatReg(injR);

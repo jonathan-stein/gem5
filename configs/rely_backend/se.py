@@ -140,7 +140,8 @@ system.cpu[0].injector = Injector(
     startPC=start_pc,
     endPC=end_pc,
     verbose=(options.fi_verbose != None),
-    reliability=options.fi_reliability)
+    fpuReliability=options.fi_fpu_reliability,
+    aluReliability=options.fi_alu_reliability)
 
 
 # Use the classic cache simulator.

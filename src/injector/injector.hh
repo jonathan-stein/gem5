@@ -185,7 +185,8 @@ class Injector : public SimObject {
     bool verbose;
 
     // Specify instruction-level reliability.
-    double reliability;
+    double fpuReliability;
+    double aluReliability;
     
     // A random number generator in the range of [0.0, 1.0].
     std::random_device rd;
