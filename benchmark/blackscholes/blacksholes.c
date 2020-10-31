@@ -40,7 +40,7 @@ double CNDF(double x) {
 
 // The main function: blacksholes.
 // Calculate the price of a call option based on the parameters.
-double blacksholes(const double stockPrice,
+double blackscholes(const double stockPrice,
     const double exercisePrice,
     const double riskFreeInterest,
     const double timeToExpiration,
@@ -65,8 +65,8 @@ int main(int argc, char *argv[]) {
   const double volatility = 0.05;
 
   // The result call price should be 21.406580.
-  const double callPrice = blacksholes(stockPrice, exercisePrice, riskFreeInterest,
+  const double callPrice = blackscholes(stockPrice, exercisePrice, riskFreeInterest,
       timeToExpiration, volatility);
-  printf("Result: %f\n", callPrice);
+  printf("Result: %e\n", callPrice);
   return 0;
 }
