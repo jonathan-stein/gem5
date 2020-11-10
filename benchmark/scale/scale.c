@@ -41,15 +41,31 @@ void scale(uint8_t *image, const int width, const int height, const int channel,
 
 
 int main(int argc, char* argv[]) {
-  if (argc != 4) {
-    fprintf(stderr, "Usage: ./scale input.png output.png scaleRatio\n");
+  if (argc != 7) {
+    fprintf(stderr, "Usage: ./scale input output width height channel scaleRatio\n");
     return -1;
   }
 
+  FILE* input = fopen(argv[1], "r");
+
   // Determine the scale and load the image.
   int width, height, channel;
-  uint8_t *image = stbi_load(argv[1], &width, &height, &channel, 0);
-  const float scaleRatio = strtof(argv[3], NULL);
+  width = atoi(argv[3]);
+  height = atoi(argv[4]);
+  channel = atoi(argv[5]);
+  uint8_t *image = malloc(width * height * channel * sizeof(uint8_t));
+  int counter = 0;
+  unsigned val[1];
+  int ret = fscanf(input, "%u\n", val);
+  image[counter++] = val[0];
+  while (ret != EOF) {
+    ret = fscanf(input, "%u\n", val);
+    image[counter++] = val[0];
+  }
+  fclose(input);
+
+
+  const float scaleRatio = strtof(argv[6], NULL);
 
   // Allocate the memory for scaled image.
   const int scaleWidth = width * scaleRatio;
@@ -58,11 +74,16 @@ int main(int argc, char* argv[]) {
 
   scale(image, width, height, channel, scaleImage, scaleRatio);
 
-  // Write the output file.
-  stbi_write_png(argv[2], scaleWidth, scaleHeight, channel, scaleImage, scaleWidth * channel);
+  // Write output file
+  FILE* output = fopen(argv[2], "w+");
+  for (int i = 0; i < scaleWidth * scaleHeight * channel; i++) {
+    fprintf(output, "%u\n", scaleImage[i]);
+  }
+
+  fclose(output);
 
   // Free resources.
-  stbi_image_free(image);
   free(scaleImage);
+  free(image);
   return 0;
 }
