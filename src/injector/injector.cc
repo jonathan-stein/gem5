@@ -25,14 +25,14 @@ void Injector::advancePC(Addr nextPC) {
   if (nextPC == this->startPC) {
     if (!inMain && verbose) {
       std::cout << "[INFO] Reach start PC " << std::hex
-        << this->startPC << std::dec << std::endl;
+          << this->startPC << std::dec << std::endl;
     }
 
     inMain = true;
   } else if (nextPC == this->endPC) {
     if (inMain && verbose) {
       std::cout << "[INFO] Reach end PC " << std::hex
-        << this->endPC << std::dec << std::endl;
+          << this->endPC << std::dec << std::endl;
     }
 
     inMain = false;
@@ -53,7 +53,7 @@ void Injector::performFI(ThreadContext* thread,
   }
 
   if (curStaticInst->isFloating() && curStaticInst->numDestRegs() > 0) {
-    OpClass instOpClass = curStaticInst->opClass();
+    const OpClass instOpClass = curStaticInst->opClass();
     if ((instOpClass >= OpClass::FloatAdd && instOpClass <= OpClass::FloatSqrt) || 
         (instOpClass >= OpClass::SimdFloatAdd && instOpClass <= OpClass::SimdFloatSqrt) ||
         (instOpClass >= OpClass::SimdFloatReduceAdd && instOpClass <= OpClass::SimdFloatReduceCmp)) {
@@ -62,19 +62,20 @@ void Injector::performFI(ThreadContext* thread,
           std::cout << "[INJE]" << std::endl;
         }
 
-        int injReg = curStaticInst->destRegIdx(0).index();
+        const int injReg = curStaticInst->destRegIdx(0).index();
         this->flipBit(thread, injReg, 30, 1);
       }
     }
   } else if (curStaticInst->isInteger() && curStaticInst->numDestRegs() > 0) {
-    OpClass instOpClass = curStaticInst->opClass();
-    if (instOpClass == OpClass::IntAlu || instOpClass == OpClass::SimdAlu || instOpClass == OpClass::SimdPredAlu || instOpClass == OpClass::SimdReduceAlu) {
+    const OpClass instOpClass = curStaticInst->opClass();
+    if (instOpClass == OpClass::IntAlu || instOpClass == OpClass::SimdAlu ||
+        instOpClass == OpClass::SimdPredAlu || instOpClass == OpClass::SimdReduceAlu) {
       if (dis(gen) > aluReliability) {
         if (verbose) {
           std::cout << "[INJE]" << std::endl;
         }
 
-        int injReg = curStaticInst->destRegIdx(0).index();
+        const int injReg = curStaticInst->destRegIdx(0).index();
         this->flipBit(thread, injReg, 30, 0);
       }
     }
