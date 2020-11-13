@@ -29,6 +29,21 @@ from common.Caches import *
 from common.cpu2000 import *
 
 
+def addFIOptions(parser):
+    """ Fault Injector Options """
+    parser.add_option("--fi-fpu-reliability", action="store", type="float",
+                    default=1.0,
+                    help="Specify the reliability of fpu instructions.")
+    parser.add_option("--fi-alu-reliability", action="store", type="float",
+                    default=1.0,
+                    help="Specify the reliability of alu instructions.")
+    parser.add_option("--fi-function_name", action="store", type="string",
+                    default="main",
+                    help="Specify the function to inject errors in")
+    parser.add_option("--fi-verbose", action="store_true",
+                    help="Print out instructions executed and error injection info.")
+
+
 def get_workload(options):
     """Interprets provided options and returns the process to execute"""
     process = Process(pid=100)
@@ -51,7 +66,7 @@ def get_workload(options):
 
 
 def get_start_end_pc(cmd, function_name):
-    assembly = str(subprocess.check_output(["objdump", "-d", cmd])).split("\\n")
+    assembly = str(subprocess.check_output(["objdump", "-d", cmd])).split("\n")
     start_pc = None
     end_pc = None
     in_func = False
@@ -70,7 +85,7 @@ def get_start_end_pc(cmd, function_name):
 parser = optparse.OptionParser()
 Options.addCommonOptions(parser)
 Options.addSEOptions(parser)
-Options.addFIOptions(parser)
+addFIOptions(parser)
 
 (options, args) = parser.parse_args()
 if args:

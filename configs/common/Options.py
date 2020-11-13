@@ -475,17 +475,3 @@ def addFSOptions(parser):
     parser.add_option("--command-line-file", action="store",
                       default=None, type="string",
                       help="File with a template for the kernel command line")
-
-def addFIOptions(parser):
-    # Fault Injector Options
-    parser.add_option("--fi-fpu-reliability", action="store", type="float",
-                    default=1.0,
-                    help="Specify the reliability of fpu instructions.")
-    parser.add_option("--fi-alu-reliability", action="store", type="float",
-                    default=1.0,
-                    help="Specify the reliability of alu instructions.")
-    parser.add_option("--fi-function_name", action="store", type="string",
-                    default="<main>",
-                    help="Specify the function to inject errors in")
-    parser.add_option("--fi-verbose", action="store_true",
-                    help="Print out instructions executed and error injection info.")
