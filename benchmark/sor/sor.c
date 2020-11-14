@@ -10,7 +10,6 @@
  */
 #include <stdio.h>
 #include <stdlib.h>
-// #include <math.h>
 
 
 // Implementat the math sqrt() on our own. We need to run Rely analysis on that.
@@ -19,10 +18,19 @@
 // We use a fixed-iteration for loop instead.
 float sqrtImpl(const float x) {
   float z = 1.0f;
-  for (int i = 1; i <= 30; i += 1) {
+  for (int i = 0; i < 30; i += 1) {
     z -= (z*z - x) / (2*z);
   }
   return z;
+}
+
+float norm(float *a, const int n) {
+  float norm = 0;
+  for (int i = 0; i < n; i++) {
+    norm += (a[i] * a[i]);
+  }
+  norm = sqrtImpl(norm);
+  return norm;
 }
 
 
@@ -44,28 +52,26 @@ void vecsub(float *a, float *b, float *result, const int n) {
   }
 }
 
-float norm(float *a, const int n) {
-  float norm = 0;
-  for (int i = 0; i < n; i++) {
-    norm += (a[i] * a[i]);
-  }
-  // norm = sqrtf(norm); // A library call!
-  norm = sqrtImpl(norm);
-  return norm;
-}
-
 // A: n*n matrix
 // b: n dimensional vector
 // omega: relaxation factor
 // phi: solution vector (starts as initial guess)
+//
 // The main function: sor.
+//
+// NOTE: To facilitate Rely analysis, we cannot have unbounded while loops.
+// I replace the while loop with a fixed iteration for loop.
+// It is kind of tricky, as it renders the residual value useless.
 void sor(float **A, float *b, float omega, float* phi, const int n) {
   float multResult[n];
   float subResult[n];
+
   matvec(A, phi, multResult, n, n);
   vecsub(multResult, b, subResult, n);
-  float residual = norm(subResult, n);
-  while (residual > tolerance) {
+  // float residual = norm(subResult, n);
+
+  // while (residual > tolerance) {
+  for (int i = 0; i < 40; i += 1) {
     for (int i = 0; i < n; i++) {
       float sigma = 0;
       for (int j = 0; j < n; j++) {
@@ -75,11 +81,11 @@ void sor(float **A, float *b, float omega, float* phi, const int n) {
       }
       phi[i] = (1 - omega) * phi[i] + (omega / A[i][i]) * (b[i] - sigma);
     }
+
     matvec(A, phi, multResult, n, n);
     vecsub(multResult, b, subResult, n);
-    residual = norm(subResult, n);
+    // residual = norm(subResult, n);
   }
-  return;
 }
 
 
