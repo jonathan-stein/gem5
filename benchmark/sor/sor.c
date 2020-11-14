@@ -10,7 +10,20 @@
  */
 #include <stdio.h>
 #include <stdlib.h>
-#include <math.h>
+// #include <math.h>
+
+
+// Implementat the math sqrt() on our own. We need to run Rely analysis on that.
+// Ref: https://stackoverflow.com/questions/3581528/how-is-the-square-root-function-implemented
+// NOTE: it is very important not to use while loop. Rely analysis cannot handle unbounded loops.
+// We use a fixed-iteration for loop instead.
+float sqrtImpl(const float x) {
+  float z = 1.0f;
+  for (int i = 1; i <= 30; i += 1) {
+    z -= (z*z - x) / (2*z);
+  }
+  return z;
+}
 
 
 static const float tolerance = 0.00000001f;
@@ -36,7 +49,8 @@ float norm(float *a, const int n) {
   for (int i = 0; i < n; i++) {
     norm += (a[i] * a[i]);
   }
-  norm = sqrtf(norm); // A library call!
+  // norm = sqrtf(norm); // A library call!
+  norm = sqrtImpl(norm);
   return norm;
 }
 
