@@ -57,6 +57,10 @@ void Injector::performFI(ThreadContext* thread,
     if ((instOpClass >= OpClass::FloatAdd && instOpClass <= OpClass::FloatSqrt) || 
         (instOpClass >= OpClass::SimdFloatAdd && instOpClass <= OpClass::SimdFloatSqrt) ||
         (instOpClass >= OpClass::SimdFloatReduceAdd && instOpClass <= OpClass::SimdFloatReduceCmp)) {
+      if (verbose) {
+        std::cout << "[CAN INJECT FPU] OpClass " << OpClass::IntAlu
+            << " Target Register " << curStaticInst->destRegIdx(0).index() << std::endl;
+      }
       if (dis(gen) > fpuReliability) {
         if (verbose) {
           std::cout << "[INJE]" << std::endl;
@@ -70,6 +74,10 @@ void Injector::performFI(ThreadContext* thread,
     const OpClass instOpClass = curStaticInst->opClass();
     if (instOpClass == OpClass::IntAlu || instOpClass == OpClass::SimdAlu ||
         instOpClass == OpClass::SimdPredAlu || instOpClass == OpClass::SimdReduceAlu) {
+      if (verbose) {
+        std::cout << "[CAN INJECT ALU] OpClass " << OpClass::IntAlu
+            << " Target Register " << curStaticInst->destRegIdx(0).index() << std::endl;
+      }
       if (dis(gen) > aluReliability) {
         if (verbose) {
           std::cout << "[INJE]" << std::endl;
