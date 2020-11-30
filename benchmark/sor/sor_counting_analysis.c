@@ -156,7 +156,7 @@ void sor(float **A, float *b, float omega, float* phi) {
 
 // The result is stored in phi.
 // ALU op: 54 + 4681 = 4735
-// FPU op: 36 + 3680 = 3716
+// FPU op: 36 + 3360 = 3396
 void sor(float **A, float *b, float omega, float* phi) {
   float multResult[4];
   float subResult[4];
@@ -169,16 +169,16 @@ void sor(float **A, float *b, float omega, float* phi) {
 
   // The k loop has:
   // ALU op: 1 + (61 + 54 + 2) * 40 = 4681
-  // FPU op: (56 + 36) * 40 = 3680
+  // FPU op: (48 + 36) * 40 = 3360
   for (int k = 0; k < 40; k += 1) {
   
     // This i loop has:
     // ALU op: 1 + (13 + 2) * 4 = 61
-    // FPU op: (8 + 6) * 4 = 56
+    // FPU op: (6 + 6) * 4 = 48
     for (int i = 0; i < 4; i++) {
       // This inner loop has:
       // ALU op: 1 + (1 + 2) * 4 = 13
-      // FPU op: 2 * 4 = 8
+      // FPU op: 2 * 3 = 6
       float sigma = 0;
       for (int j = 0; j < 4; j++) {
         if (j != i) {
