@@ -42,6 +42,12 @@ def addFIOptions(parser):
                     help="Specify the function to inject errors in")
     parser.add_option("--fi-verbose", action="store_true",
                     help="Print out instructions executed and error injection info.")
+    parser.add_option("--fi-start-pc", action="store", type="string",
+                    default=None,
+                    help="The start address of the error injection function.")
+    parser.add_option("--fi-end-pc", action="store", type="string",
+                    default=None,
+                    help="The end address of the error injection function.")
 
 
 def get_workload(options):
@@ -150,7 +156,13 @@ system.cpu[0].createThreads()
 
 # Get the start and end Program Counter for the main function, which
 # defines the range we will inject error.
-start_pc, end_pc = get_start_end_pc(options.cmd, "<" + options.fi_function_name + ">:")
+if options.fi_start_pc is None or options.fi_end_pc is None or len(options.fi_start_pc) == 0 or len(options.fi_end_pc) == 0:
+    start_pc, end_pc = get_start_end_pc(options.cmd, "<" + options.fi_function_name + ">:")
+    print("Start PC {} End PC {}".format(start_pc, end_pc))
+else:
+    start_pc = options.fi_start_pc
+    end_pc = options.fi_end_pc
+
 system.cpu[0].injector = Injector(
     startPC=start_pc,
     endPC=end_pc,
