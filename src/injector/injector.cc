@@ -58,7 +58,7 @@ void Injector::performFI(ThreadContext* thread,
         (instOpClass >= OpClass::SimdFloatAdd && instOpClass <= OpClass::SimdFloatSqrt) ||
         (instOpClass >= OpClass::SimdFloatReduceAdd && instOpClass <= OpClass::SimdFloatReduceCmp)) {
       if (verbose) {
-        std::cout << "[CAN INJECT FPU] OpClass " << OpClass::IntAlu
+        std::cout << "[CAN INJECT FPU] OpClass " << instOpClass
             << " Target Register " << curStaticInst->destRegIdx(0).index() << std::endl;
       }
       if (dis(gen) > fpuReliability) {
@@ -67,7 +67,7 @@ void Injector::performFI(ThreadContext* thread,
         }
 
         const int injReg = curStaticInst->destRegIdx(0).index();
-        this->flipBit(thread, injReg, 30, 1);
+        this->flipBit(thread, injReg, 5, 1);
       }
     }
   } else if (curStaticInst->isInteger() && curStaticInst->numDestRegs() > 0) {
@@ -75,7 +75,7 @@ void Injector::performFI(ThreadContext* thread,
     if (instOpClass == OpClass::IntAlu || instOpClass == OpClass::SimdAlu ||
         instOpClass == OpClass::SimdPredAlu || instOpClass == OpClass::SimdReduceAlu) {
       if (verbose) {
-        std::cout << "[CAN INJECT ALU] OpClass " << OpClass::IntAlu
+        std::cout << "[CAN INJECT ALU] OpClass " << instOpClass
             << " Target Register " << curStaticInst->destRegIdx(0).index() << std::endl;
       }
       if (dis(gen) > aluReliability) {
