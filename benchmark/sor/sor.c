@@ -71,7 +71,7 @@ void sor(float **A, float *b, float omega, float* phi, const int n) {
   // float residual = norm(subResult, n);
 
   // while (residual > tolerance) {
-  for (int i = 0; i < 40; i += 1) {
+  for (int k = 0; k < 40; k += 1) {
     for (int i = 0; i < n; i++) {
       float sigma = 0;
       for (int j = 0; j < n; j++) {
