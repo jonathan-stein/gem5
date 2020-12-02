@@ -193,6 +193,11 @@ class Injector : public SimObject {
     std::mt19937 gen;
     std::uniform_real_distribution<double> dis;
 
+    // For instruction hardening overhead measurement.
+    int runCount;
+    int instCountThisRun;
+    int instCountTotal;
+
   private:
     // Helper functions
     void flipBit(ThreadContext* thread, int injR, int injBit, int regType);

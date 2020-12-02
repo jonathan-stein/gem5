@@ -673,9 +673,11 @@ BaseSimpleCPU::advancePC(const Fault &fault)
             TheISA::PCState pcState = thread->pcState();
             TheISA::advancePC(pcState, curStaticInst);
             // We should call injector->advancePC after TheISA::advancePC.
-            // If curPC is not changed, we might call advancePC multiple times
-            // with the same PC value. Despite its overhead, it is okay to do so.
-            injector->advancePC(thread->pcState().pc());
+            // For instruction counting purpose, we will invoke injector->advancePC
+            // for every lastMicroop.
+            if (curStaticInst->isLastMicroop()) {
+                injector->advancePC(thread->pcState().pc());
+            }
             thread->pcState(pcState);
         }
     }

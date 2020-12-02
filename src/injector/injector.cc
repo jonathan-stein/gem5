@@ -19,7 +19,10 @@ Injector::Injector(InjectorParams *params) :
     fpuReliability(params->fpuReliability),
     aluReliability(params->aluReliability),
     gen(rd()),
-    dis(0.0, 1.0) {}
+    dis(0.0, 1.0),
+    runCount(0),
+    instCountThisRun(0),
+    instCountTotal(0) {}
 
 void Injector::advancePC(Addr nextPC) {
   if (nextPC == this->startPC) {
@@ -29,6 +32,7 @@ void Injector::advancePC(Addr nextPC) {
     }
 
     inMain = true;
+    instCountThisRun = 1;
   } else if (nextPC == this->endPC) {
     if (inMain && verbose) {
       std::cout << "[INFO] Reach end PC " << std::hex
@@ -36,6 +40,14 @@ void Injector::advancePC(Addr nextPC) {
     }
 
     inMain = false;
+    instCountThisRun += 1;
+    instCountTotal += instCountThisRun;
+    runCount += 1;
+
+    std::cout << "[INFO] This run instruction count: " << instCountThisRun << std::endl;
+    std::cout << "[INFO] Average instruction count: " << static_cast<float>(instCountTotal) / static_cast<float>(runCount) << std::endl;
+  } else if (inMain) {
+    instCountThisRun += 1;
   }
 }
 
