@@ -41,8 +41,22 @@ void sssp(GraphNode_t *graph, const int n) {
         const float weight = graph[node].edgeWeights[neighborIdx];
 
         // Relax edges.
-        if (edgeSource->distance + weight < edgeDestination->distance) {
-          edgeDestination->distance = edgeSource->distance + weight;
+        //-- Hardened: edgeSource->distance + weight < edgeDestination->distance
+        //-- Hardened: edgeDestination->distance = edgeSource->distance + weight;
+        float add, addH;
+        do {
+          add = edgeSource->distance + weight;
+          addH = edgeSource->distance + weight;
+        } while (add != addH);
+
+        int pred, predH;
+        do {
+          pred = add < edgeDestination->distance;
+          predH = add < edgeDestination->distance;
+        } while (pred != predH);
+
+        if (pred) {
+          edgeDestination->distance = add;
         }
       }
     }
