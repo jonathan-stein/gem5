@@ -12,43 +12,42 @@
 #include <stdlib.h>
 
 
-// Implementat the math sqrt() on our own. We need to run Rely analysis on that.
-// Ref: https://stackoverflow.com/questions/3581528/how-is-the-square-root-function-implemented
-// NOTE: it is very important not to use while loop. Rely analysis cannot handle unbounded loops.
-// We use a fixed-iteration for loop instead.
-float sqrtImpl(const float x) {
-  float z = 1.0f;
-  for (int i = 0; i < 30; i += 1) {
-    z -= (z*z - x) / (2*z);
-  }
-  return z;
-}
-
-float norm(float *a, const int n) {
-  float norm = 0;
-  for (int i = 0; i < n; i++) {
-    norm += (a[i] * a[i]);
-  }
-  norm = sqrtImpl(norm);
-  return norm;
-}
-
-
-static const float tolerance = 0.00000001f;
-
 void matvec(float **A, float *x, float *b, const int m, const int n) {
   for (int row = 0; row < m; row += 1) {
     float sum = 0;
+
     for (int col = 0; col < n; col += 1) {
-      sum += A[row][col] * x[col];
+      //-- Hardened: prod = A[row][col] * x[col];
+      float prod, prodH;
+      do {
+        prod = A[row][col] * x[col];
+        prodH = A[row][col] * x[col];
+      } while (prod != prodH);
+
+      //-- Hardened: add = sum + prod
+      float add, addH;
+      do {
+        add = sum + prod;
+        addH = sum + prod;
+      } while (add != addH);
+
+      sum = add;
     }
+
     b[row] = sum;
   }
 }
 
 void vecsub(float *a, float *b, float *result, const int n) {
   for (int i = 0; i < n; i++) {
-    result[i] = a[i] - b[i];
+    //-- Hardened: result[i] = a[i] - b[i]
+    float sub, subH;
+    do {
+      sub = a[i] - b[i];
+      subH = a[i] - b[i];
+    } while (sub != subH);
+
+    result[i] = subH;
   }
 }
 
@@ -68,23 +67,71 @@ void sor(float **A, float *b, float omega, float* phi, const int n) {
 
   matvec(A, phi, multResult, n, n);
   vecsub(multResult, b, subResult, n);
-  // float residual = norm(subResult, n);
 
-  // while (residual > tolerance) {
   for (int k = 0; k < 40; k += 1) {
     for (int i = 0; i < n; i++) {
       float sigma = 0;
       for (int j = 0; j < n; j++) {
         if (j != i) {
-          sigma += A[i][j] * phi[j];
+          //-- Hardened: sigma += A[i][j] * phi[j];
+          float prod, prodH;
+          do {
+            prod = A[i][j] * phi[j];
+            prodH = A[i][j] * phi[j];
+          } while (prod != prodH);
+
+          float add, addH;
+          do {
+            add = sigma + prod;
+            addH = sigma + prod;
+          } while (add != addH);
+
+          sigma = add;
         }
       }
-      phi[i] = (1 - omega) * phi[i] + (omega / A[i][i]) * (b[i] - sigma);
+
+      //-- Hardened: phi[i] = (1 - omega) * phi[i] + (omega / A[i][i]) * (b[i] - sigma);
+      float sub1, sub1H;
+      do {
+        sub1 = 1 - omega;
+        sub1H = 1 - omega;
+      } while (sub1 != sub1H);
+
+      float sub2, sub2H;
+      do {
+        sub2 = b[i] - sigma;
+        sub2H = b[i] - sigma;
+      } while (sub2 != sub2H);
+
+      float div, divH;
+      do {
+        div = omega / A[i][i];
+        divH = omega / A[i][i];
+      } while (div != divH);
+
+      float prod1, prod1H;
+      do {
+        prod1 = sub1 * phi[i];
+        prod1H = sub1 * phi[i];
+      } while (prod1 != prod1H);
+      
+      float prod2, prod2H;
+      do {
+        prod2 = div * sub2;
+        prod2H = div * sub2;
+      } while (prod2 != prod2H);
+      
+      float add, addH;
+      do {
+        add = prod1 + prod2;
+        addH = prod1 + prod2;
+      } while (add != addH);
+
+      phi[i] = add;
     }
 
     matvec(A, phi, multResult, n, n);
     vecsub(multResult, b, subResult, n);
-    // residual = norm(subResult, n);
   }
 }
 
